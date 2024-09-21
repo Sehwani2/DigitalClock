@@ -1,0 +1,3 @@
+../Core/Src/buzzer.c:12:6:activateBuzzer30msOn	24	static
+../Core/Src/buzzer.c:24:6:activateBuzzer30msOff	24	static
+../Core/Src/buzzer.c:39:6:checkAndRingBuzzer	4	static

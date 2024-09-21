@@ -1,0 +1,4 @@
+../Core/Src/watch.c:15:6:isLeapYear	16	static
+../Core/Src/watch.c:27:5:getDaysInMonth	24	static
+../Core/Src/watch.c:51:6:updateWatchTime	16	static
+../Core/Src/watch.c:89:6:updateWatchDisplay	32	static

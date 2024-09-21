@@ -1,0 +1,4 @@
+../Core/Src/lap.c:13:6:LapMeasure	40	static
+../Core/Src/lap.c:43:6:LapDisplay	48	static
+../Core/Src/lap.c:66:6:LapClear	8	static
+../Core/Src/lap.c:75:6:handleLapState	8	static

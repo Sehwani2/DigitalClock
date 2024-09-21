@@ -1,0 +1,69 @@
+/*
+ * stopwatch.c
+ *
+ *  Created on: Sep 19, 2024
+ *      Author: hyn02
+ */
+#include "stopwatch.h"
+#include "CLCD.h"
+#include "7SEG.h"
+
+volatile StopWatch Stopwatch = {STOPPED,{0,0,0,0}};
+
+
+
+void updateStopwatchTime(void)
+{
+	if(Stopwatch.Time.millisecond >= 1000)
+	{
+		Stopwatch.Time.millisecond = 0;
+		Stopwatch.Time.second++;
+	}
+	if(Stopwatch.Time.second >= 60)
+	{
+		Stopwatch.Time.second = 0;
+		Stopwatch.Time.minutes++;
+	}
+	if(Stopwatch.Time.minutes >= 60)
+	{
+		Stopwatch.Time.minutes = 0;
+		Stopwatch.Time.hours++;
+	}
+	if(Stopwatch.Time.hours >= 24)
+	{
+		Stopwatch.Time.hours = 0;
+	}
+}
+
+void updateStopwatchState(void)
+{
+    if(Stopwatch.State == RUNNING)
+    {
+    	Stopwatch.Time.millisecond++;
+        updateStopwatchTime();
+    }
+
+    if(Stopwatch.State == STOPPED)
+    {
+    	Stopwatch.Time.hours = 0;
+    	Stopwatch.Time.minutes = 0;
+    	Stopwatch.Time.second = 0;
+    	Stopwatch.Time.millisecond = 0;
+    }
+}
+
+void updateStopwatchDisplay(void)
+{
+    // 7SEG
+    _7SEG_SetNumber(DGT1, Stopwatch.Time.second % 10, ON);
+    _7SEG_SetNumber(DGT2, Stopwatch.Time.millisecond / 100, OFF);
+
+    // CLCD
+    sprintf(clcd.str1, "STW %02d:%02d:%02d.%03d",
+    		Stopwatch.Time.hours,
+			Stopwatch.Time.minutes,
+			Stopwatch.Time.second,
+			Stopwatch.Time.millisecond);
+
+    CLCD_Puts(0, 0, clcd.str1);
+}

@@ -1,0 +1,3 @@
+../Core/Src/stopwatch.c:15:6:updateStopwatchTime	4	static
+../Core/Src/stopwatch.c:38:6:updateStopwatchState	8	static
+../Core/Src/stopwatch.c:55:6:updateStopwatchDisplay	16	static

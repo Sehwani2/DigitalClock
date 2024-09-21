@@ -1,0 +1,4 @@
+../Core/Src/lap.c:13:6:LapMeasure	2
+../Core/Src/lap.c:43:6:LapDisplay	3
+../Core/Src/lap.c:66:6:LapClear	1
+../Core/Src/lap.c:75:6:handleLapState	5
