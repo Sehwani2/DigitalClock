@@ -55,6 +55,7 @@ typedef enum _Mode{
 /* USER CODE BEGIN EC */
 extern bool BuzLock ;
 extern volatile Mode mode;
+extern volatile Mode previousMode;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

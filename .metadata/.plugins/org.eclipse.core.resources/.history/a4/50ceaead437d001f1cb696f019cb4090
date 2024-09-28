@@ -1,0 +1,24 @@
+/*
+ * alarm.h
+ *
+ *  Created on: Sep 27, 2024
+ *      Author: hyn02
+ */
+
+#ifndef INC_ALARM_H_
+#define INC_ALARM_H_
+
+#include "main.h"
+
+typedef struct _AlarmTime{
+	uint8_t hour;
+	uint8_t minute;
+}AlarmTime;
+
+typedef struct _Alarm{
+	uint8_t alarmToggle;
+	uint8_t alarmIndex;
+	AlarmTime alarmTime;
+};
+
+#endif /* INC_ALARM_H_ */

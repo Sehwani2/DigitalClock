@@ -153,6 +153,7 @@ void WatchHandleButton1(void)
 		{
 			if (watchConfig.SubMode == WATCH_NORMAL)
 			{
+				CLCD_Clear();
 				mode = (mode + 1) % NUM_MODES;
 			}
 			Btn1.ReleasedTime = Idle_Released;

@@ -1,0 +1,2 @@
+../Core/Src/alarm.c:18:6:displayAlarmSettings	32	static
+../Core/Src/alarm.c:69:6:alert	8	static

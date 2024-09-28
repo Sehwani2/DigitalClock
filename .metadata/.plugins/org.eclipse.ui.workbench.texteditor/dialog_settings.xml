@@ -6,8 +6,11 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value="updateWatchTime"/>
+		<item key="selection" value="printf"/>
 		<list key="findhistory">
+			<item value="printf"/>
+			<item value="printff"/>
+			<item value="pritnf"/>
 			<item value="updateWatchTime"/>
 		</list>
 		<list key="replacehistory">

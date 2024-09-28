@@ -31,7 +31,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Core/Inc/gpio.h ../Core/Inc/7SEG.h ../Core/Inc/CLCD.h \
  ../Core/Inc/lap.h ../Core/Inc/CLCD.h ../Core/Inc/stopwatch.h \
  ../Core/Inc/buzzer.h ../Core/Inc/btn.h ../Core/Inc/buzzer.h \
- ../Core/Inc/stopwatch.h ../Core/Inc/watch.h
+ ../Core/Inc/stopwatch.h ../Core/Inc/watch.h ../Core/Inc/alarm.h
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
 ../Core/Inc/stm32f4xx_hal_conf.h:
@@ -75,3 +75,4 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/buzzer.h:
 ../Core/Inc/stopwatch.h:
 ../Core/Inc/watch.h:
+../Core/Inc/alarm.h:

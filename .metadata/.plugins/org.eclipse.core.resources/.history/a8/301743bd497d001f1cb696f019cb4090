@@ -1,0 +1,98 @@
+/*
+ * watch.h
+ *
+ *  Created on: Sep 21, 2024
+ *      Author: hyn02
+ */
+
+#ifndef INC_WATCH_H_
+#define INC_WATCH_H_
+
+#include "main.h"
+
+#define NUM_ITEM 6
+// setting mode
+typedef enum _WatchSubMode {
+    WATCH_NORMAL,
+    WATCH_CLOCK_SETTING
+} WatchSubMode;
+
+typedef enum WatchTimeField {
+    SET_SECOND,
+    SET_MINUTE,
+    SET_HOUR,
+    SET_DAY,
+    SET_MONTH,
+    SET_YEAR,
+} WatchTimeField;
+
+typedef struct _WatchStrings {
+    char second[3];
+    char minute[3];
+    char hour[3];
+    char day[3];
+    char month[3];
+    char year[5];
+} WatchStrings;
+
+typedef struct _WatchFlags {
+    uint8_t increaseFlagOnce;
+    uint8_t decreaseFlagOnce;
+    uint8_t increaseFlag150ms;
+    uint8_t decreaseFlag150ms;
+    uint8_t increaseFlag20ms;
+    uint8_t decreaseFlag20ms;
+}WatchFlags;
+
+typedef struct _WatchConfig{
+	WatchTimeField WatchTime;
+	WatchStrings watchStrings;
+	WatchSubMode SubMode;
+	bool NextItem;
+	WatchFlags flags;
+    uint16_t IdleTimer;
+}WatchConfig;
+
+
+
+// watch
+typedef struct _WatchTime{
+	volatile int years;
+	volatile int months;
+	volatile int days;
+	volatile int hours;
+	volatile int minutes;
+	volatile int second;
+	volatile int millisecond;
+}WatchTime;
+
+typedef enum _WatchMode {
+    MODE_12_HOUR,
+    MODE_24_HOUR,
+} WatchMode;
+
+typedef struct _Watch{
+	volatile	WatchTime Time;
+	bool isLeap;
+	WatchMode WatchMode;
+}Watch;
+
+extern Watch watch;
+extern WatchConfig watchConfig;
+
+
+
+void InitializeWatch(void) ;
+bool isLeapYear(uint16_t year);
+int getDaysInMonth(Watch* watch);
+void updateWatchTime(void);
+void updateWatchDisplay(void);
+void ClockSettingMode(void);
+void IncreaseTimeOnce(void);
+void DecreaseTimeOnce(void);
+void UpdateWatchString(char* timeString, int timeValue, int milliseconds);
+bool AreAllButtonsIdle();
+void AutoSwitchToWatchMode();
+void IncreaseTime(void);
+void DecreaseTime(void);
+#endif /* INC_WATCH_H_ */

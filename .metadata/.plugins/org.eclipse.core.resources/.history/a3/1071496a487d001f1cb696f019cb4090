@@ -1,0 +1,22 @@
+/*
+ * alarm.c
+ *
+ *  Created on: Sep 27, 2024
+ *      Author: hyn02
+ */
+
+
+#include "alarm.h"
+
+Alarm alarm;
+
+void displayAlarmSettings(void)
+{
+	const char* OnOff;
+
+	if(alarm.alarmTime[alarm.alarmIndex].isEnabled)
+	{
+
+	}
+
+}

@@ -1,0 +1,27 @@
+/*
+ * alarm.c
+ *
+ *  Created on: Sep 27, 2024
+ *      Author: hyn02
+ */
+
+
+#include "alarm.h"
+
+Alarm alarm;
+
+void displayAlarmSettings(void)
+{
+	int displayHour = watch.Time.hours;
+	const char* OnOff;
+
+	if(alarm.alarmTime[alarm.alarmIndex].isEnabled)
+	{
+		OnOff = "ON";
+	}
+	else
+	{
+		OnOff = "OFF";
+	}
+
+}

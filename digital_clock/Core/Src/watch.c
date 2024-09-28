@@ -17,7 +17,7 @@ WatchConfig watchConfig;
 void InitializeWatch(void)
 {
     watch = (Watch){
-        .Time = {2024, 9, 22, 0, 0, 1, 1},
+        .Time = {2024, 9, 28, 12, 0, 55, 0},
         .isLeap = false,
         .WatchMode = MODE_12_HOUR
     };

@@ -10,6 +10,8 @@
 
 #include "main.h"
 
+#define NUM_ITEM 6
+
 // setting mode
 typedef enum _WatchSubMode {
     WATCH_NORMAL,
@@ -79,7 +81,7 @@ typedef struct _Watch{
 extern Watch watch;
 extern WatchConfig watchConfig;
 
-#define NUM_ITEM 6
+
 
 void InitializeWatch(void) ;
 bool isLeapYear(uint16_t year);
