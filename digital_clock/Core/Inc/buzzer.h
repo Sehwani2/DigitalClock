@@ -25,7 +25,9 @@ typedef struct _Buz{
 
 extern Buz Buz1;
 
+void InitializeBuzzer() ;
 void activateBuzzer30msOn(Buz* buzzer, TIM_HandleTypeDef* htim, uint32_t channel,uint32_t psc);
 void activateBuzzer30msOff(Buz* buzzer, TIM_HandleTypeDef* htim, uint32_t channel);
 void checkAndRingBuzzer(void);
+void handleBuzzerActivation(void);
 #endif /* INC_BUZZER_H_ */

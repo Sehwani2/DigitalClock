@@ -1,3 +1,10 @@
-../Core/Src/btn.c:15:6:HandleButtonPress	7
-../Core/Src/btn.c:49:6:CheckButtonPressTime	3
-../Core/Src/btn.c:65:6:BtnHoldEvent	4
+../Core/Src/btn.c:15:6:InitializeButtons	1
+../Core/Src/btn.c:38:6:HandleButtonPress	7
+../Core/Src/btn.c:72:6:CheckButtonPressTime	3
+../Core/Src/btn.c:88:6:BtnHoldEvent	4
+../Core/Src/btn.c:100:6:CheckBtnHoldingTime	3
+../Core/Src/btn.c:117:6:BtnThresHoldEvent	5
+../Core/Src/btn.c:136:6:WatchHandleButton1	5
+../Core/Src/btn.c:163:6:WatchHandleButton2	6
+../Core/Src/btn.c:190:6:WatchHandleButton3	9
+../Core/Src/btn.c:235:6:WatchHandleButton4	7

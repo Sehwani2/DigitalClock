@@ -1,3 +1,5 @@
-../Core/Src/buzzer.c:12:6:activateBuzzer30msOn	2
-../Core/Src/buzzer.c:24:6:activateBuzzer30msOff	3
-../Core/Src/buzzer.c:39:6:checkAndRingBuzzer	6
+../Core/Src/buzzer.c:13:7:InitializeBuzzer	1
+../Core/Src/buzzer.c:22:6:activateBuzzer30msOn	2
+../Core/Src/buzzer.c:34:6:activateBuzzer30msOff	3
+../Core/Src/buzzer.c:49:6:checkAndRingBuzzer	8
+../Core/Src/buzzer.c:64:6:handleBuzzerActivation	7

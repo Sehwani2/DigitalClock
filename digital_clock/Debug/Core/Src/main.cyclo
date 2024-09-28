@@ -1,7 +1,7 @@
 ../Core/Src/main.c:64:5:_write	1
-../Core/Src/main.c:80:5:main	20
-../Core/Src/main.c:268:6:SystemClock_Config	3
-../Core/Src/main.c:313:13:MX_NVIC_Init	1
-../Core/Src/main.c:333:6:HAL_GPIO_EXTI_Callback	13
-../Core/Src/main.c:382:6:HAL_TIM_PeriodElapsedCallback	2
-../Core/Src/main.c:409:6:Error_Handler	1
+../Core/Src/main.c:80:5:main	9
+../Core/Src/main.c:193:6:SystemClock_Config	3
+../Core/Src/main.c:238:13:MX_NVIC_Init	1
+../Core/Src/main.c:258:6:HAL_GPIO_EXTI_Callback	19
+../Core/Src/main.c:323:6:HAL_TIM_PeriodElapsedCallback	2
+../Core/Src/main.c:357:6:Error_Handler	1

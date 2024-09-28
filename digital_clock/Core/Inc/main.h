@@ -40,6 +40,7 @@ extern "C" {
 // for Digital Clock mode
 typedef enum _Mode{
 	WATCH,
+	ALARM,
 	STOPWATCH,
 }Mode;
 
@@ -47,12 +48,13 @@ typedef enum _Mode{
 #define SHORT_PRESS_TIME 700
 #define LONG_PRESS_TIME  2500
 
-#define NUM_MODES 2
+#define NUM_MODES 3
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
 extern bool BuzLock ;
+extern volatile Mode mode;
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

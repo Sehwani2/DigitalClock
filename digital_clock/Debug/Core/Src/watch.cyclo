@@ -1,4 +1,13 @@
-../Core/Src/watch.c:15:6:isLeapYear	4
-../Core/Src/watch.c:27:5:getDaysInMonth	6
-../Core/Src/watch.c:51:6:updateWatchTime	7
-../Core/Src/watch.c:89:6:updateWatchDisplay	9
+../Core/Src/watch.c:17:6:InitializeWatch	1
+../Core/Src/watch.c:32:6:isLeapYear	4
+../Core/Src/watch.c:44:5:getDaysInMonth	6
+../Core/Src/watch.c:68:6:updateWatchTime	7
+../Core/Src/watch.c:113:6:updateWatchDisplay	10
+../Core/Src/watch.c:204:6:ClockSettingMode	7
+../Core/Src/watch.c:263:6:UpdateWatchString	2
+../Core/Src/watch.c:288:6:IncreaseTimeOnce	18
+../Core/Src/watch.c:370:6:IncreaseTime	7
+../Core/Src/watch.c:395:6:DecreaseTimeOnce	19
+../Core/Src/watch.c:482:6:DecreaseTime	7
+../Core/Src/watch.c:506:6:AreAllButtonsIdle	6
+../Core/Src/watch.c:510:6:AutoSwitchToWatchMode	3

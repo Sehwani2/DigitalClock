@@ -65,7 +65,7 @@ void LapDisplay()
 
 void LapClear()
 {
-	sprintf(clcd.str2,"                 ");
+	sprintf(clcd.str2,"                ");
 	CLCD_Puts(0, 1, clcd.str2);
 	lap.count = 0;
 	lap.CurrnetDisplay = 0;

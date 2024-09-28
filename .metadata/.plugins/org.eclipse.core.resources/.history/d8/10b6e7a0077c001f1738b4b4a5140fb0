@@ -1,0 +1,463 @@
+/*
+ * watch.c
+ *
+ *  Created on: Sep 21, 2024
+ *      Author: hyn02
+ */
+
+
+#include "watch.h"
+#include "CLCD.h"
+#include "7SEG.h"
+#include <stdio.h>
+
+Watch watch;
+WatchConfig watchConfig;
+static 	uint16_t timer = 0;
+
+bool isLeapYear(uint16_t year)
+{
+	 if((year % 4 == 0 && year % 100 !=0) || year % 400 == 0)
+	 {
+		 return true;
+	 }
+	 else
+	 {
+		 return false;
+	 }
+}
+
+int getDaysInMonth(Watch* watch)
+{
+	 uint16_t year = watch->Time.years;
+	 uint8_t months = watch->Time.months;
+	switch(months)
+	{
+	case 1: case 3: case 5: case 7: case 8: case 10: case 12:
+		return 31;
+	case 4: case 6: case 9: case 11:
+	    return 30;
+	case 2:
+		if(isLeapYear(year))
+		{
+			return 29;
+		}
+		else
+		{
+			return 28;
+		}
+	default :
+		return -1;
+	}
+}
+
+void updateWatchTime(void)
+{
+
+	watch.Time.millisecond++;
+
+	if(watch.Time.millisecond >= 1000)
+	{
+		watch.Time.millisecond = 0;
+
+//		if(watchConfig.SubMode == WATCH_CLOCK_SETTING)
+//		{
+//			return;
+//		}
+
+		watch.Time.second++;
+
+		if(watch.Time.second >= 60)
+		{
+			watch.Time.second = 0;
+			watch.Time.minutes++;
+		}
+		if(watch.Time.minutes >= 60)
+		{
+			watch.Time.minutes = 0;
+			watch.Time.hours++;
+		}
+		if(watch.Time.hours >= 24)
+		{
+			watch.Time.hours = 0;
+			watch.Time.days++;
+		}
+		if(watch.Time.days > getDaysInMonth(&watch))
+		{
+			watch.Time.days = 1;
+			watch.Time.months++;
+		}
+		if(watch.Time.months > 12)
+		{
+			watch.Time.months = 1;
+			watch.Time.years++;
+		}
+		watch.isLeap = isLeapYear(watch.Time.years);
+	}
+}
+
+void updateWatchDisplay(void)
+{
+	char* BuzState;
+	const char* colon;
+
+    // 7SEG
+    _7SEG_SetNumber(DGT1, watch.Time.second / 10, OFF);
+    _7SEG_SetNumber(DGT2, watch.Time.second % 10, OFF);
+
+    // CLCD
+    if(watch.isLeap)
+    {
+    	sprintf(clcd.str1, "LEAP  %04d.%02d.%02d",
+    			watch.Time.years,
+				watch.Time.months,
+				watch.Time.days);
+    }
+    else
+    {
+    	sprintf(clcd.str1, "      %04d.%02d.%02d",
+    	    	watch.Time.years,
+    			watch.Time.months,
+    			watch.Time.days);
+    }
+
+    if (watch.Time.millisecond >= 500)
+    {
+       colon = " ";  // 콜론을 공백으로 변경
+    }
+    else
+    {
+        colon = ":";  // 콜론을 표시
+    }
+
+
+    if (BuzLock == 0)
+    {
+        BuzState = "BZ OFF";
+    }
+    else if(BuzLock == 1)
+    {
+    	BuzState = "BZ ON";
+    }
+
+    if(watch.WatchMode == MODE_12_HOUR)
+    {
+    	int displayHour = watch.Time.hours;
+    	const char* period = "AM";
+
+    	if (displayHour == 0)
+    	{
+    	    displayHour = 12; // 0시를 12시로 표시
+    	    period = "AM"; // 자정
+    	}
+    	else if (displayHour < 12)
+    	{
+    	    period = "AM"; // 오전
+    	}
+    	else
+    	{
+    	    period = "PM"; // 오후
+    	    if (displayHour > 12)
+    	    {
+    	        displayHour -= 12;
+    	    }
+    	}
+
+    	sprintf(clcd.str2,"%06s  %s %02d%s%02d",
+    			BuzState,
+    			period,
+				displayHour,
+				colon,
+    			watch.Time.minutes);
+    }
+    else if(watch.WatchMode == MODE_24_HOUR)
+    {
+    	sprintf(clcd.str2,"%s     %02d%s%02d",
+    			BuzState,
+    			watch.Time.hours,
+				colon,
+				watch.Time.minutes
+    			);
+    }
+
+    CLCD_Puts(0, 0, clcd.str1);
+    CLCD_Puts(0, 1, clcd.str2);
+}
+//////////////////////////////////////////
+//setiing mode///
+void ClockSettingMode(void)
+{
+	 	AutoSwitchToWatchMode();
+
+	    // 7SEG
+	    _7SEG_SetNumber(DGT1, watch.Time.second / 10, OFF);
+	    _7SEG_SetNumber(DGT2, watch.Time.second % 10, OFF);
+
+	    // CLCD
+	    sprintf(watchConfig.watchStrings.second, "%02d", watch.Time.second);
+	    sprintf(watchConfig.watchStrings.minute, "%02d", watch.Time.minutes);
+	    sprintf(watchConfig.watchStrings.hour, "%02d", watch.Time.hours);
+	    sprintf(watchConfig.watchStrings.day, "%02d", watch.Time.days);
+	    sprintf(watchConfig.watchStrings.month, "%02d", watch.Time.months);
+	    sprintf(watchConfig.watchStrings.year, "%04d", watch.Time.years);
+
+
+	    switch(watchConfig.WatchTime)
+	    {
+	    case SET_SECOND:
+	    	UpdateWatchString(watchConfig.watchStrings.second, watch.Time.second, watch.Time.millisecond);
+	    	break;
+
+	    case SET_MINUTE:
+	    	UpdateWatchString(watchConfig.watchStrings.minute, watch.Time.minutes, watch.Time.millisecond);
+	    	break;
+
+	    case SET_HOUR:
+	    	UpdateWatchString(watchConfig.watchStrings.hour, watch.Time.hours, watch.Time.millisecond);
+	    	break;
+
+	    case SET_DAY:
+	    	UpdateWatchString(watchConfig.watchStrings.day, watch.Time.days, watch.Time.millisecond);
+	    	break;
+
+	    case SET_MONTH:
+	    	UpdateWatchString(watchConfig.watchStrings.month, watch.Time.months, watch.Time.millisecond);
+	    	break;
+
+	    case SET_YEAR:
+	    	UpdateWatchString(watchConfig.watchStrings.year, watch.Time.years, watch.Time.millisecond);
+	    	break;
+	    }
+
+	    	sprintf(clcd.str1,"CLOCK %s.%s.%s",
+	    			watchConfig.watchStrings.year,
+					watchConfig.watchStrings.month,
+					watchConfig.watchStrings.day);
+
+
+	    	sprintf(clcd.str2,"SET     %s:%s:%s",
+	    			watchConfig.watchStrings.hour,
+					watchConfig.watchStrings.minute,
+					watchConfig.watchStrings.second);
+
+
+
+	    CLCD_Puts(0, 0, clcd.str1);
+	    CLCD_Puts(0, 1, clcd.str2);
+}
+bool AreAllButtonsIdle() {
+    return (Btn1.state == Idle && Btn2.state == Idle && Btn3.state == Idle && Btn4.state == Idle);
+}
+
+void AutoSwitchToWatchMode()
+{
+	if(AreAllButtonsIdle())
+	{
+		timer++;
+	}
+	else
+	{
+		timer = 0;
+	}
+
+	if(timer > 30*1000)
+	{
+		watchConfig.SubMode = WATCH_NORMAL;
+		idleTimer = 0;
+	}
+}
+
+void UpdateWatchString(char* timeString, int timeValue, int milliseconds)
+{
+    if (watchConfig.flags.increaseFlagOnce  ||
+        watchConfig.flags.increaseFlag150ms ||
+        watchConfig.flags.increaseFlag20ms  ||
+        watchConfig.flags.decreaseFlagOnce  ||
+        watchConfig.flags.decreaseFlag150ms ||
+        watchConfig.flags.decreaseFlag20ms)
+    {
+        sprintf(timeString, "%02d", timeValue);
+    }
+    else
+    {
+        if (milliseconds >= 500)
+        {
+            sprintf(timeString, "  ");
+        }
+        else
+        {
+            sprintf(timeString, "%02d", timeValue);
+        }
+    }
+}
+
+
+void IncreaseTimeOnce(void)
+{
+		switch (watchConfig.WatchTime)
+		{
+		case SET_SECOND:
+			if (++watch.Time.second == 59)
+			{
+				watch.Time.second = 0;
+				watch.Time.minutes++;
+			}
+			break;
+
+		case SET_MINUTE:
+			if (++watch.Time.minutes == 59)
+			{
+				watch.Time.minutes = 0;
+				watch.Time.hours++;
+			}
+			break;
+
+		case SET_HOUR:
+			if (++watch.Time.hours == 23)
+			{
+				watch.Time.hours = 0;
+				watch.Time.days++;
+			}
+			break;
+
+		case SET_DAY:
+			if (++watch.Time.days == getDaysInMonth(&watch))
+			{
+				watch.Time.days = 1;
+				watch.Time.months++;
+			}
+			break;
+
+		case SET_MONTH:
+			if (++watch.Time.months == 12)
+			{
+				watch.Time.months = 1;
+				watch.Time.years++;
+			}
+			break;
+
+		case SET_YEAR:
+			if (++watch.Time.years == 3000)
+			{
+				watch.Time.years = 1900;
+			}
+			break;
+		}
+
+		// 최대일수 다시 구함
+		int maxDays = getDaysInMonth(&watch);
+
+		if (watch.Time.days > maxDays)
+		{
+			watch.Time.days = maxDays;
+		}
+
+		// 추가적인 오버플로 처리
+		if (watch.Time.minutes >= 60)
+		{
+			watch.Time.minutes = 0;
+			watch.Time.hours++;
+		}
+		if (watch.Time.hours >= 24)
+		{
+			watch.Time.hours = 0;
+			watch.Time.days++;
+		}
+		if (watch.Time.days > getDaysInMonth(&watch))
+		{
+			watch.Time.days = 1;
+			watch.Time.months++;
+		}
+		if (watch.Time.months > 12)
+		{
+			watch.Time.months = 1;
+			watch.Time.years++;
+		}
+}
+void DecreaseTimeOnce(void)
+{
+	switch (watchConfig.WatchTime)
+	{
+	case SET_SECOND:
+		if (--watch.Time.second < 0)
+		{
+			watch.Time.second = 59;
+			watch.Time.minutes--;
+		}
+
+		break;
+
+	case SET_MINUTE:
+		if (--watch.Time.minutes < 0)
+		{
+			watch.Time.minutes = 59;
+			watch.Time.hours--;
+		}
+
+		break;
+
+	case SET_HOUR:
+		if (--watch.Time.hours < 0)
+		{
+			watch.Time.hours = 23;
+			watch.Time.days--;
+		}
+		break;
+
+	case SET_DAY:
+		if (watch.Time.days < 1)
+		{
+			watch.Time.days = getDaysInMonth(&watch);
+			watch.Time.months--;
+		}
+
+		break;
+
+	case SET_MONTH:
+		if (--watch.Time.months < 1)
+		{
+			watch.Time.months = 12;
+			watch.Time.years--;
+		}
+		break;
+
+	case SET_YEAR:
+		if (--watch.Time.years < 1900)
+		{
+			watch.Time.years = 3000;
+		}
+		break;
+	}
+		///////
+		int maxDays = getDaysInMonth(&watch);
+
+		if (watch.Time.days > maxDays)
+		{
+			watch.Time.days = maxDays;
+		}
+		///// underflow
+		if (watch.Time.minutes < 0)
+		{
+			watch.Time.minutes = 59;
+			watch.Time.hours--;
+		}
+		if (watch.Time.hours < 0)
+		{
+			watch.Time.hours = 23;
+			watch.Time.days--;
+		}
+		if (watch.Time.days < 1)
+		{
+			watch.Time.months--;
+			watch.Time.days = getDaysInMonth(&watch);
+		}
+		if (watch.Time.months < 1)
+		{
+			watch.Time.months = 12;
+			watch.Time.years--;
+		}
+		if (watch.Time.years < 1900)
+		{
+			watch.Time.years = 3000;
+		}
+}

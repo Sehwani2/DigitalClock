@@ -1,3 +1,10 @@
-../Core/Src/btn.c:15:6:HandleButtonPress	24	static
-../Core/Src/btn.c:49:6:CheckButtonPressTime	16	static
-../Core/Src/btn.c:65:6:BtnHoldEvent	24	static
+../Core/Src/btn.c:15:6:InitializeButtons	4	static
+../Core/Src/btn.c:38:6:HandleButtonPress	24	static
+../Core/Src/btn.c:72:6:CheckButtonPressTime	16	static
+../Core/Src/btn.c:88:6:BtnHoldEvent	24	static
+../Core/Src/btn.c:100:6:CheckBtnHoldingTime	24	static
+../Core/Src/btn.c:117:6:BtnThresHoldEvent	24	static
+../Core/Src/btn.c:136:6:WatchHandleButton1	8	static
+../Core/Src/btn.c:163:6:WatchHandleButton2	8	static
+../Core/Src/btn.c:190:6:WatchHandleButton3	8	static
+../Core/Src/btn.c:235:6:WatchHandleButton4	8	static

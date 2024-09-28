@@ -13,6 +13,7 @@
 
 ///////////////////////////// BTN
 typedef enum _BtnHold{
+	BtnHold_Idle,
 	BtnHold_Short,
 	BtnHold_Mid,
 	BtnHold_Long,
@@ -29,15 +30,23 @@ typedef enum _ButtonRT{
 	Short_Released,
 	Mid_Released,
 	Long_Released,
-}ButtonPT;
+}ButtonRT;
+
+typedef enum _BtnThreshold{
+	Idle_Threshold,
+	Short_Mid_Threshold,
+	Mid_Long_Threshold,
+}BtnThreshold;
 
 
 typedef struct _Button{
 	int millisecond;
+	uint8_t SettingModeCount;
 	bool is_pressed;
 	BtnState state;
-	ButtonPT ReleasedTime;
+	ButtonRT ReleasedTime;
 	BtnHold holdTime;
+	BtnThreshold btnThreshold;
 }Button;
 
 extern Button Btn1;
@@ -45,8 +54,15 @@ extern Button Btn2;
 extern Button Btn3;
 extern Button Btn4;
 
-
+void InitializeButtons();
 void HandleButtonPress(Button* btn, GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin_Num);
 void CheckButtonPressTime(Button* Btn);
 void BtnHoldEvent(Button* btn,GPIO_TypeDef* GPIO,uint16_t GPIO_PIN );
+void BtnThresHoldEvent(Button* btn,GPIO_TypeDef* GPIO,uint16_t GPIO_PIN );
+void CheckBtnHoldingTime(Button* btn,GPIO_TypeDef* GPIO,uint16_t GPIO_PIN );
+void WatchHandleButton1(void);
+void WatchHandleButton2(void);
+void WatchHandleButton3(void);
+void WatchHandleButton4(void);
+
 #endif /* INC_BTN_H_ */

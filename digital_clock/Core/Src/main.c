@@ -63,8 +63,8 @@ static void MX_NVIC_Init(void);
 
 int _write(int file, char*p , int len)
 {
- HAL_UART_Transmit(&huart3, p , len , 10);
- return len;
+	HAL_UART_Transmit(&huart3, p , len , 10);
+	return len;
 }
 /* USER CODE END PFP */
 
@@ -128,29 +128,9 @@ int main(void)
 
 	mode = WATCH;
 
-	Buz1.BuzOnOff = false;
-	Buz1.BuzCount = 0;
-	Buz1.BuzFlag = false;
-	Buz1.BuzTone = Idle_Released;
-	BuzLock = false;
-
-	Btn1.is_pressed = false;
-	Btn2.is_pressed = false;
-	Btn3.is_pressed = false;
-	Btn4.is_pressed = false;
-
-	Btn1.ReleasedTime = Idle_Released;
-	Btn2.ReleasedTime = Idle_Released;
-	Btn3.ReleasedTime = Idle_Released;
-	Btn4.ReleasedTime = Idle_Released;
-
-	watch = (Watch){
-	    .Time = {2024, 9, 21, 0, 0, 0, 0},
-	    .isLeap = false,
-	    .WatchMode = MODE_12_HOUR
-	};
-
-
+	InitializeBuzzer();
+	InitializeButtons();
+	InitializeWatch();
 
   /* USER CODE END 2 */
 
@@ -160,100 +140,45 @@ int main(void)
   {
 	  switch(mode)
 	  {
-	  case WATCH:
+	  	  case WATCH:
+	  		  switch(watchConfig.SubMode)
+	  		  {
+	  		  	  case WATCH_NORMAL:
+	  		  		  updateWatchDisplay();
+	  		  		  break;
+	  		  	  case WATCH_CLOCK_SETTING:
+	  		  		  ClockSettingMode();
+	  		  		  break;
+	  		  }
+	  		  //btn event
+	  		  WatchHandleButton1();
+	  		  WatchHandleButton2();
+	  		  WatchHandleButton3();
+	  		  WatchHandleButton4();
+	  	  break;
 
-		  updateWatchDisplay();
-		  checkAndRingBuzzer();
-		  //btn press event
-		  //btn1
-			switch (Btn1.ReleasedTime)
-			{
-			case Short_Released:
-				mode = (mode + 1) % NUM_MODES;
-				Btn1.ReleasedTime = Idle_Released;
-				break;
-			case Mid_Released:
-				break;
-			case Long_Released:
-				break;
-			default :
-				break;
-			}
-		  //btn2
-			switch (Btn2.ReleasedTime)
-			{
-			case Short_Released:
-				BuzLock = !BuzLock;
-				CLCD_Clear();
-				Btn2.ReleasedTime = Idle_Released;
-				break;
-			case Mid_Released:
-				break;
-			case Long_Released:
-				break;
-			default :
-				break;
-			}
-		  //btn3
-			switch(Btn3.ReleasedTime)
-			{
-			case Short_Released:
-				watch.WatchMode = !watch.WatchMode;
-				Btn3.ReleasedTime = Idle_Released;
-				break;
-			case Mid_Released:
-				break;
-			case Long_Released:
-				break;
-			default :
-				break;
-			}
-		  //btn4
-			switch(Btn4.ReleasedTime)
-			{
-			case Short_Released:
-				Btn4.ReleasedTime = Idle_Released;
-				break;
-			case Mid_Released:
-				break;
-			case Long_Released:
-				break;
-			default :
-				break;
-			}
-		  break;
+		  case ALARM:
 
-	  case STOPWATCH:
-		  break;
+			  	if (Btn1.state == Pressing)
+			  	{
+
+			  	}
+			  	else // released
+			  	{
+			  		if(Btn1.ReleasedTime == Short_Released)
+			  		{
+			  			mode = (mode + 1) % NUM_MODES;
+			  			Btn1.ReleasedTime = Idle_Released;
+			  		}
+			  	}
+
+	  	  	  break;
+		  case STOPWATCH:
+			  break;
 	  }
-
 
 	  // buzzer
-
-	  if(Buz1.BuzFlag)
-	  {
-		  Buz1.BuzFlag = false;
-
-			if (!BuzLock)
-			{
-				switch (Buz1.BuzTone)
-				{
-				case BUZ_TONE_LOW_PSC:
-					activateBuzzer30msOn(&Buz1, &htim2, TIM_CHANNEL_1,
-							BUZ_TONE_LOW_PSC);
-					break;
-				case BUZ_TONE_MID_PSC:
-					activateBuzzer30msOn(&Buz1, &htim2, TIM_CHANNEL_1,
-							BUZ_TONE_MID_PSC);
-					break;
-				case BUZ_TONE_HIGH_PSC:
-					activateBuzzer30msOn(&Buz1, &htim2, TIM_CHANNEL_1,
-							BUZ_TONE_HIGH_PSC);
-					break;
-				}
-			}
-
-	  }
+	  handleBuzzerActivation();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -315,12 +240,12 @@ static void MX_NVIC_Init(void)
   /* TIM6_DAC_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
-  /* EXTI3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
   /* EXTI15_10_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+  /* EXTI3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI3_IRQn);
   /* EXTI4_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI4_IRQn);
@@ -332,17 +257,16 @@ static void MX_NVIC_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	printf("btn debugging");
 	//btn1
 	if (GPIO_Pin == GPIO_PIN_3)
 	{
-
 		if(HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_3) == GPIO_PIN_SET && Btn1.state == Idle)
 		{
 			Buz1.BuzTone = BUZ_TONE_LOW_PSC;
 			Buz1.BuzFlag = true;
 		}
 		HandleButtonPress(&Btn1, GPIOE, GPIO_PIN_3);
+
 	}
 
 	//btn2
@@ -352,8 +276,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		{
 			Buz1.BuzTone = BUZ_TONE_LOW_PSC;
 			Buz1.BuzFlag = true;
+
+			if (mode == WATCH && watchConfig.SubMode == WATCH_CLOCK_SETTING)
+			{
+				watchConfig.NextItem = 1;  // clock setting flag on
+			}
 		}
 		HandleButtonPress(&Btn2, GPIOC, GPIO_PIN_15);
+
 	}
 
 	//btn3
@@ -363,6 +293,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		{
 			Buz1.BuzTone = BUZ_TONE_LOW_PSC;
 			Buz1.BuzFlag = true;
+
+			if (mode == WATCH && watchConfig.SubMode == WATCH_CLOCK_SETTING)
+			{
+				watchConfig.flags.increaseFlagOnce = 1;  // clock increase flag on
+			}
 		}
 		HandleButtonPress(&Btn3, GPIOD, GPIO_PIN_4);
 	}
@@ -374,7 +309,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		{
 			Buz1.BuzTone = BUZ_TONE_LOW_PSC;
 			Buz1.BuzFlag = true;
+
+			if (mode == WATCH && watchConfig.SubMode == WATCH_CLOCK_SETTING)
+			{
+				watchConfig.flags.decreaseFlagOnce = 1;  // clock decrease flag on
+			}
 		}
+
 		HandleButtonPress(&Btn4, GPIOD, GPIO_PIN_10);
 	}
 }
@@ -393,6 +334,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 		//watch time
 		updateWatchTime();
+
+		///watch time in/decrease flag
+		IncreaseTime();
+		DecreaseTime();
+
+		////auto switch to watchmode
+		AutoSwitchToWatchMode();
 
 
 		//buz off

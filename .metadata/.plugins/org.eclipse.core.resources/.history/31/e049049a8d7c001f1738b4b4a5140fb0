@@ -1,0 +1,218 @@
+/*
+ * btn.c
+ *
+ *  Created on: Sep 17, 2024
+ *      Author: hyn02
+ */
+#include "btn.h"
+
+Button Btn1;
+Button Btn2;
+Button Btn3;
+Button Btn4;
+
+
+void HandleButtonPress(Button *btn, GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin_Num)
+{
+	if (HAL_GPIO_ReadPin(GPIOx, GPIO_Pin_Num) == GPIO_PIN_SET)
+	{
+		if (btn->is_pressed == false)// to reduce debouncing
+		{
+			btn->is_pressed = true;
+
+
+			if (btn->state == Idle)
+			{
+				btn->state = Pressing;
+			}
+		}
+	}
+	else if (HAL_GPIO_ReadPin(GPIOx, GPIO_Pin_Num) == GPIO_PIN_RESET)
+	{
+		if (btn->is_pressed == true) // to reduce debouncing
+		{
+
+			btn->is_pressed = false;
+
+			if (btn->state == Pressing)
+			{
+				btn->state = Released;
+				CheckButtonPressTime(btn);
+
+			}
+			btn->millisecond = 0;
+			btn->state = Idle;
+		}
+	}
+}
+
+void CheckButtonPressTime(Button* Btn)
+{
+	if(Btn->millisecond < SHORT_PRESS_TIME)
+	{
+		Btn->ReleasedTime = Short_Released;
+	}
+	else if(Btn->millisecond < LONG_PRESS_TIME)
+	{
+		Btn->ReleasedTime = Mid_Released;
+	}
+	else
+	{
+		Btn->ReleasedTime = Long_Released;
+	}
+}
+
+void BtnHoldEvent(Button* btn,GPIO_TypeDef* GPIO,uint16_t GPIO_PIN )
+{	// HOLD EVENT
+	if((HAL_GPIO_ReadPin(GPIO, GPIO_PIN) == GPIO_PIN_SET) && btn->state == Pressing)
+	{
+		if (btn->millisecond < LONG_PRESS_TIME + 51)
+		{
+			btn->millisecond++;
+		}
+
+	}
+}
+
+void CheckBtnHoldingTime(Button* btn,GPIO_TypeDef* GPIO,uint16_t GPIO_PIN )
+{
+	// Holding Time
+	if(btn->millisecond < SHORT_PRESS_TIME)
+	{
+		btn->holdTime = BtnHold_Short;
+	}
+	else if(btn->millisecond < LONG_PRESS_TIME)
+	{
+		btn->holdTime = BtnHold_Mid;
+	}
+	else
+	{
+		btn->holdTime = BtnHold_Long;
+	}
+}
+
+void BtnThresHoldEvent(Button* btn,GPIO_TypeDef* GPIO,uint16_t GPIO_PIN )
+{
+	if(btn->millisecond >= (SHORT_PRESS_TIME - 50) &&
+	   btn->millisecond <= (SHORT_PRESS_TIME + 50)	)
+	{
+		btn->btnThreshold = Short_Mid_Threshold;
+		Buz1.BuzTone = BUZ_TONE_MID_PSC;
+		Buz1.BuzFlag = true;
+	}
+	else if(btn->millisecond >= (LONG_PRESS_TIME - 50) &&
+			btn->millisecond <= (LONG_PRESS_TIME + 50))
+	{
+		btn->btnThreshold = Mid_Long_Threshold;
+		Buz1.BuzTone = BUZ_TONE_HIGH_PSC;
+		Buz1.BuzFlag = true;
+	}
+}
+
+void WatchHandleButton1()
+{
+	if (Btn1.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn1, GPIOE, GPIO_PIN_3);
+		BtnThresHoldEvent(&Btn1, GPIOE, GPIO_PIN_3);
+
+		if (Btn1.btnThreshold == Short_Mid_Threshold)
+		{
+			watchConfig.SubMode = !watchConfig.SubMode;
+			CLCD_Clear();
+			Btn1.btnThreshold = Idle_Threshold;
+		}
+	}
+	else
+	{
+		if(Btn1.ReleasedTime == Short_Released)
+		{
+			if (watchConfig.SubMode == WATCH_NORMAL)
+			{
+				mode = (mode + 1) % NUM_MODES;
+			}
+			Btn1.ReleasedTime = Idle_Released;
+		}
+	}
+}
+
+void WatchHandleButton2()
+{
+	if (Btn2.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn2, GPIOC, GPIO_PIN_15);
+		BtnThresHoldEvent(&Btn2, GPIOC, GPIO_PIN_15);
+
+		if (watchConfig.NextItem
+				&& watchConfig.SubMode == WATCH_CLOCK_SETTING)
+		{
+			watchConfig.NextItem = 0;
+			watchConfig.WatchTime = (watchConfig.WatchTime + 1) % NUM_ITEM;
+		}
+	}
+	else
+	{
+		if(Btn2.ReleasedTime == Short_Released)
+		{
+			if (watchConfig.SubMode == WATCH_NORMAL)
+			{
+				BuzLock = !BuzLock;
+			}
+			Btn2.ReleasedTime = Idle_Released;
+		}
+	}
+}
+
+void WatchHandleButton3()
+{
+	if (Btn3.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn3, GPIOD, GPIO_PIN_4);
+		BtnThresHoldEvent(&Btn3, GPIOD, GPIO_PIN_4);
+
+		if (watchConfig.flags.increaseFlagOnce)
+		{
+			IncreaseTimeOnce();
+			watchConfig.flags.increaseFlagOnce = 0;
+		}
+
+		switch (Btn3.holdTime)
+		{
+		case BtnHold_Mid:
+			if (watchConfig.flags.increaseFlag150ms)
+			{
+				watchConfig.flags.increaseFlag150ms = 0;
+				IncreaseTimeOnce();
+			}
+			break;
+		case BtnHold_Long:
+			if (watchConfig.flags.increaseFlag20ms)
+			{
+				watchConfig.flags.increaseFlag20ms = 0;
+				IncreaseTimeOnce();
+			}
+			break;
+		}
+
+	} else {
+		switch (Btn3.ReleasedTime) {
+		case Short_Released:
+			if (watchConfig.SubMode == WATCH_NORMAL) {
+				watch.WatchMode = !watch.WatchMode;
+			}
+			Btn3.ReleasedTime = Idle_Released;
+			break;
+		case Mid_Released:
+			break;
+		case Long_Released:
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+void WatchHandleButton4()
+{
+
+}
