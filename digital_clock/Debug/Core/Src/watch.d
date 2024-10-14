@@ -28,7 +28,8 @@ Core/Src/watch.o: ../Core/Src/watch.c ../Core/Inc/btn.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
  ../Core/Inc/buzzer.h ../Core/Inc/watch.h ../Core/Inc/CLCD.h \
- ../Core/Inc/7SEG.h
+ ../Core/Inc/7SEG.h ../Core/Inc/mode.h ../Core/Inc/alarm.h \
+ ../Core/Inc/watch.h
 ../Core/Inc/btn.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h:
@@ -63,3 +64,6 @@ Core/Src/watch.o: ../Core/Src/watch.c ../Core/Inc/btn.h \
 ../Core/Inc/watch.h:
 ../Core/Inc/CLCD.h:
 ../Core/Inc/7SEG.h:
+../Core/Inc/mode.h:
+../Core/Inc/alarm.h:
+../Core/Inc/watch.h:

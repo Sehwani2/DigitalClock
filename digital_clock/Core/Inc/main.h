@@ -32,30 +32,27 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 
 // for Digital Clock mode
-typedef enum _Mode{
-	WATCH,
-	ALARM,
-	STOPWATCH,
-}Mode;
+
 
 
 #define SHORT_PRESS_TIME 700
 #define LONG_PRESS_TIME  2500
-
-#define NUM_MODES 3
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
 extern bool BuzLock ;
-extern volatile Mode mode;
-extern volatile Mode previousMode;
+extern bool NextItem;
+
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/

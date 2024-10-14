@@ -24,7 +24,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
 #include "7SEG.h"
 #include "CLCD.h"
 #include "lap.h"
@@ -33,6 +32,7 @@
 #include "stopwatch.h"
 #include "watch.h"
 #include "alarm.h"
+#include "mode.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -53,9 +53,8 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-volatile Mode mode = WATCH;
-volatile Mode previousMode;
 bool BuzLock;
+bool NextItem;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -137,6 +136,8 @@ int main(void)
 	alarm.alarmTime[alarm.alarmIndex].minute = 1;
 	alarm.alarmTime[alarm.alarmIndex].isEnabled = 1;
 
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -170,65 +171,21 @@ int main(void)
 			else
 			{
 				displayAlarmSettings();
-
-				if (Btn1.state == Pressing)
-				{
-
-				}
-				else // released
-				{
-					if (Btn1.ReleasedTime == Short_Released)
-					{
-						CLCD_Clear();
-						mode = (mode + 1) % NUM_MODES;
-						alarm.alarmIndex = 0;
-						Btn1.ReleasedTime = Idle_Released;
-					}
-				}
-				//////////////
-				if (Btn2.state == Pressing)
-				{
-
-				}
-				else // released
-				{
-					if (Btn2.ReleasedTime == Short_Released)
-					{
-						alarm.alarmIndex = (alarm.alarmIndex + 1) % MAX_ALARMS;
-						Btn2.ReleasedTime = Idle_Released;
-					}
-				}
-				///////////////////////
-				if (Btn3.state == Pressing)
-				{
-
-				}
-				else // released
-				{
-					if (Btn3.ReleasedTime == Short_Released)
-					{
-						alarm.alarmTime[alarm.alarmIndex].isEnabled =
-								!alarm.alarmTime[alarm.alarmIndex].isEnabled;
-						Btn3.ReleasedTime = Idle_Released;
-					}
-				}
+				//btn event
+				AlarmHandleButton1();
+				AlarmHandleButton2();
+				AlarmHandleButton3();
+				AlarmHandleButton4();
 			}
 			break;
+
 		  case STOPWATCH:
-			if (Btn1.state == Pressing)
-			{
+			  updateStopwatchDisplay();
 
-			}
-			else // released
-			{
-				if (Btn1.ReleasedTime == Short_Released)
-				{
-					CLCD_Clear();
-					mode = (mode + 1) % NUM_MODES;
-					Btn1.ReleasedTime = Idle_Released;
-				}
-			}
-
+			  StopwatchHandleButton1();
+			  StopwatchHandleButton2();
+			  StopwatchHandleButton3();
+			  StopwatchHandleButton4();
 			  break;
 	  }
 
@@ -295,15 +252,15 @@ static void MX_NVIC_Init(void)
   /* TIM6_DAC_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
+  /* EXTI4_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
   /* EXTI15_10_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
   /* EXTI3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI3_IRQn);
-  /* EXTI4_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(EXTI4_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(EXTI4_IRQn);
   /* USART3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(USART3_IRQn);
@@ -334,8 +291,17 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 			if (mode == WATCH && watchConfig.SubMode == WATCH_CLOCK_SETTING)
 			{
-				watchConfig.NextItem = 1;  // clock setting flag on
+				NextItem = 1;  // clock setting flag on
 			}
+			if(mode == ALARM && alarmSetting.alarmSubMode == ALARM_SETTING)
+			{
+				NextItem = 1;  // clock setting flag on
+			}
+			if(mode == STOPWATCH)
+			{
+				stopwatch.StopwatchFlag = 1;
+			}
+
 		}
 		HandleButtonPress(&Btn2, GPIOC, GPIO_PIN_15);
 
@@ -351,7 +317,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 			if (mode == WATCH && watchConfig.SubMode == WATCH_CLOCK_SETTING)
 			{
-				watchConfig.flags.increaseFlagOnce = 1;  // clock increase flag on
+				TimeFlag.increaseFlagOnce = 1;
+			}
+			if (mode == ALARM && alarmSetting.alarmSubMode == ALARM_SETTING)
+			{
+				TimeFlag.increaseFlagOnce = 1;
+			}
+			if(mode == STOPWATCH)
+			{
+				stopwatch.StopwatchFlag = 1;
 			}
 		}
 		HandleButtonPress(&Btn3, GPIOD, GPIO_PIN_4);
@@ -367,7 +341,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 			if (mode == WATCH && watchConfig.SubMode == WATCH_CLOCK_SETTING)
 			{
-				watchConfig.flags.decreaseFlagOnce = 1;  // clock decrease flag on
+				TimeFlag.decreaseFlagOnce = 1;  // clock decrease flag on
+			}
+			if (mode == ALARM && alarmSetting.alarmSubMode == ALARM_SETTING)
+			{
+				TimeFlag.decreaseFlagOnce = 1;  // clock increase flag on
+			}
+			if(mode == STOPWATCH)
+			{
+				stopwatch.StopwatchFlag = 1;
 			}
 		}
 
@@ -395,36 +377,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		DecreaseTime();
 
 		////auto switch to watchmode
-		AutoSwitchToWatchMode();
+		//AutoSwitchToMode(&watchModeConfig);
+		//AutoSwitchToMode(&alarmModeConfig);
 
 		//// alarm
-		for (uint8_t i = 0; i < MAX_ALARMS; i++)
-		{
-		    if (watch.Time.hours == alarm.alarmTime[i].hour &&
-		        watch.Time.minutes == alarm.alarmTime[i].minute &&
-				watch.Time.second == 0 && watch.Time.millisecond == 0 &&
-		        alarm.alarmTime[i].isEnabled) // Check if the alarm is enabled
-		    {
-		    	previousMode = mode;
-		    	alarm.alertFlag = 1;
-		    	mode = ALARM;
-		    }
-		}
-
-		if(alarm.alertFlag)
-		{
-			alarm.ledTimer++;
-
-			if(alarm.ledTimer >= 30)
-			{
-				alarm.ledTimer = 0;
-				alarm.ledState = 1;
-			}
-		}
-
+		triggerAlarm();
+		AlarmLEDOff();
 
 		//buz off
 		activateBuzzer30msOff(&Buz1, &htim2, TIM_CHANNEL_1);
+
+		//stopwatch
+		updateStopwatchState();
 
 	}
 }

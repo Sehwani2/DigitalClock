@@ -1,0 +1,24 @@
+/*
+ * extra_config.h
+ *
+ *  Created on: Sep 29, 2024
+ *      Author: hyn02
+ */
+
+#ifndef INC_MODE_H_
+#define INC_MODE_H_
+
+#include "main.h"
+
+typedef struct _ModeConfig {
+    WatchSubMode *watchSubMode;
+    AlarmSubMode *alarmSubMode;
+} ModeConfig;
+
+bool AreAllButtonsIdle(void) ;
+void AutoSwitchToWatchMode(ModeConfig *config);
+
+
+extern ModeConfig watchModeConfig
+extern ModeConfig alarmModeConfig;
+#endif /* INC_MODE_H_ */

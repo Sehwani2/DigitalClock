@@ -1,0 +1,3 @@
+../Core/Src/mode.c:19:6:AreAllButtonsIdle	6
+../Core/Src/mode.c:24:6:AutoSwitchToMode	6
+../Core/Src/mode.c:52:6:UpdateWatchString	2

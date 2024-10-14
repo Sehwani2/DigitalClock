@@ -1,2 +1,6 @@
-../Core/Src/alarm.c:18:6:displayAlarmSettings	32	static
-../Core/Src/alarm.c:69:6:alert	8	static
+../Core/Src/alarm.c:20:6:displayAlarmSettings	40	static
+../Core/Src/alarm.c:120:6:alert	8	static
+../Core/Src/alarm.c:180:6:IncreaseAlarmTimeOnce	4	static
+../Core/Src/alarm.c:206:6:DecreaseAlarmTimeOnce	4	static
+../Core/Src/alarm.c:232:6:AlarmLEDOff	4	static
+../Core/Src/alarm.c:245:6:triggerAlarm	16	static

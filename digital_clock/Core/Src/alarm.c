@@ -12,8 +12,10 @@
 #include "btn.h"
 #include "7SEG.h"
 #include "buzzer.h"
+#include "mode.h"
 
 Alarm alarm;
+AlarmSetting alarmSetting;
 
 void displayAlarmSettings(void)
 {
@@ -21,11 +23,15 @@ void displayAlarmSettings(void)
 	int displayHour = alarm.alarmTime[alarm.alarmIndex].hour;
 	const char* period = "AM";
 	const char* OnOff;
+	const char* nextAlarm;
+	const char* alarmSettings;
 
 	// 7SEG
 	 _7SEG_SetNumber(DGT1, watch.Time.second / 10, OFF);
 	 _7SEG_SetNumber(DGT2, watch.Time.second % 10, OFF);
 
+	 sprintf(alarmSetting.alarmStrings.minute, "%02d", alarm.alarmTime[alarm.alarmIndex].minute);
+	 sprintf(alarmSetting.alarmStrings.hour, "%02d", alarm.alarmTime[alarm.alarmIndex].hour);
 
 	if(alarm.alarmTime[alarm.alarmIndex].isEnabled)
 	{
@@ -34,6 +40,24 @@ void displayAlarmSettings(void)
 	else
 	{
 		OnOff = "OFF";
+	}
+
+	if(alarm.alarmTime[alarm.alarmIndex].nextAlarmEnabled)
+	{
+		nextAlarm = "RPT";
+	}
+	else
+	{
+		nextAlarm = "ONC";
+	}
+
+	if(alarmSetting.alarmSubMode)
+	{
+		alarmSettings = "SET";
+	}
+	else
+	{
+		alarmSettings = "   ";
 	}
 
 	if (displayHour == 0)
@@ -52,14 +76,41 @@ void displayAlarmSettings(void)
 			displayHour -= 12;
 		}
 	}
+	if(alarmSetting.alarmSubMode == ALARM_SETTING)
+	{
+	switch(alarmSetting.alarmField)
+	{
+	case MINUTE:
+		 UpdateWatchString(alarmSetting.alarmStrings.minute, alarm.alarmTime[alarm.alarmIndex].minute, watch.Time.millisecond);
+		break;
+	case HOUR:
+		UpdateWatchString(alarmSetting.alarmStrings.hour, alarm.alarmTime[alarm.alarmIndex].hour, watch.Time.millisecond);
+		break;
+	case NEXT_ALARM_ENABLED:
+		if(watch.Time.millisecond > 500)
+		{
+			nextAlarm = "   ";
+		}
+		break;
+	case IS_ENABLED:
+		if(watch.Time.millisecond > 500)
+		{
+			OnOff = "   ";
+		}
+		break;
+	}
+	}
 
-	sprintf(clcd.str1,"ALARM #%d %s",
+	sprintf(clcd.str1,"ALARM #%d %s %s",
 			alarm.alarmIndex+1,
-			OnOff);
-	sprintf(clcd.str2,"        %s %02d:%02d",
+			OnOff,
+			nextAlarm);
+
+	sprintf(clcd.str2,"%s     %s %s:%s",
+			alarmSettings,
 			period,
-			alarm.alarmTime[alarm.alarmIndex].hour,
-			alarm.alarmTime[alarm.alarmIndex].minute);
+			alarmSetting.alarmStrings.hour,
+			alarmSetting.alarmStrings.minute);
 
 	CLCD_Puts(0, 0, clcd.str1);
 	CLCD_Puts(0, 1, clcd.str2);
@@ -92,16 +143,7 @@ void alert(void)
 				HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
 				HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
 			}
-			else
-			{
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
 
-				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
-				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-			}
 ////////////////////////buzzer/////////////////////////
 			Buz1.BuzTone = BUZ_TONE_HIGH_PSC;
 			Buz1.BuzFlag = true;
@@ -117,7 +159,102 @@ void alert(void)
 				Btn3.state = Idle;
 				Btn4.state = Idle;
 
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_12, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOD, GPIO_PIN_14, GPIO_PIN_SET);
+
+				HAL_GPIO_WritePin(GPIOC, GPIO_PIN_6, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+				HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+
 				mode = previousMode;
 				alarm.alertFlag = 0;
+
+				if(!alarm.alarmTime[alarm.alarmIndex].nextAlarmEnabled)
+				{
+					alarm.alarmTime[alarm.alarmIndex].isEnabled = 0;
+				}
 			}
 }
+
+void IncreaseAlarmTimeOnce(void)
+{
+	switch(alarmSetting.alarmField)
+	{
+	case MINUTE:
+		 if (++alarm.alarmTime[alarm.alarmIndex].minute >= 60)
+		 {
+		     alarm.alarmTime[alarm.alarmIndex].minute = 0;
+		     alarm.alarmTime[alarm.alarmIndex].hour++;
+		 }
+		break;
+	case HOUR:
+		if (alarm.alarmTime[alarm.alarmIndex].hour >= 24)
+		{
+		     alarm.alarmTime[alarm.alarmIndex].hour = 0;
+		}
+		break;
+	case NEXT_ALARM_ENABLED:
+		alarm.alarmTime[alarm.alarmIndex].nextAlarmEnabled = !alarm.alarmTime[alarm.alarmIndex].nextAlarmEnabled;
+		break;
+	case IS_ENABLED:
+		alarm.alarmTime[alarm.alarmIndex].isEnabled = !alarm.alarmTime[alarm.alarmIndex].isEnabled;
+		break;
+	}
+}
+
+void DecreaseAlarmTimeOnce(void)
+{
+	switch(alarmSetting.alarmField)
+		{
+		case MINUTE:
+			if (--alarm.alarmTime[alarm.alarmIndex].minute < 0)
+			{
+			        alarm.alarmTime[alarm.alarmIndex].minute = 59;
+			        alarm.alarmTime[alarm.alarmIndex].hour--;
+			}
+			break;
+		case HOUR:
+			if (alarm.alarmTime[alarm.alarmIndex].hour < 0)
+			{
+			        alarm.alarmTime[alarm.alarmIndex].hour = 23;
+			}
+			break;
+		case NEXT_ALARM_ENABLED:
+			alarm.alarmTime[alarm.alarmIndex].nextAlarmEnabled = !alarm.alarmTime[alarm.alarmIndex].nextAlarmEnabled;
+			break;
+		case IS_ENABLED:
+			alarm.alarmTime[alarm.alarmIndex].isEnabled = !alarm.alarmTime[alarm.alarmIndex].isEnabled;
+			break;
+		}
+}
+
+void AlarmLEDOff(void)
+{
+	if (alarm.alertFlag)
+	{
+		alarm.ledTimer++;
+
+		if (alarm.ledTimer >= 30)
+		{
+			alarm.ledTimer = 0;
+			alarm.ledState = 1;
+		}
+	}
+}
+void triggerAlarm(void)
+{
+	for (uint8_t i = 0; i < MAX_ALARMS; i++)
+	{
+		if (watch.Time.hours == alarm.alarmTime[i].hour
+				&& watch.Time.minutes == alarm.alarmTime[i].minute
+				&& watch.Time.second == 0 && watch.Time.millisecond == 0
+				&& alarm.alarmTime[i].isEnabled) // Check if the alarm is enabled
+		{
+			previousMode = mode;
+			alarm.alertFlag = 1;
+			mode = ALARM;
+		}
+	}
+}
+

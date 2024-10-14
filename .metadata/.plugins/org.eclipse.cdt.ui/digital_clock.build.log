@@ -1,122 +1,51 @@
-18:17:03 **** Incremental Build of configuration Debug for project digital_clock ****
+13:42:39 **** Incremental Build of configuration Debug for project digital_clock ****
 make -j8 all 
-arm-none-eabi-gcc "../Core/Src/alarm.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/alarm.d" -MT"Core/Src/alarm.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/alarm.o"
-../Core/Src/alarm.c: In function 'displayAlarmSettings':
-../Core/Src/alarm.c:56:9: warning: implicit declaration of function 'sprintf' [-Wimplicit-function-declaration]
-   56 |         sprintf(clcd.str1,"ALARM #%d %s",
-      |         ^~~~~~~
-../Core/Src/alarm.c:15:1: note: include '<stdio.h>' or provide a declaration of 'sprintf'
-   14 | #include "buzzer.h"
-  +++ |+#include <stdio.h>
-   15 | 
-../Core/Src/alarm.c:56:9: warning: incompatible implicit declaration of built-in function 'sprintf' [-Wbuiltin-declaration-mismatch]
-   56 |         sprintf(clcd.str1,"ALARM #%d %s",
-      |         ^~~~~~~
-../Core/Src/alarm.c:56:9: note: include '<stdio.h>' or provide a declaration of 'sprintf'
-../Core/Src/alarm.c:56:21: warning: passing argument 1 of 'sprintf' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
-   56 |         sprintf(clcd.str1,"ALARM #%d %s",
-      |                 ~~~~^~~~~
-../Core/Src/alarm.c:56:21: note: expected 'char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
-../Core/Src/alarm.c:59:21: warning: passing argument 1 of 'sprintf' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
-   59 |         sprintf(clcd.str2,"        %s %02d:%02d",
-      |                 ~~~~^~~~~
-../Core/Src/alarm.c:59:21: note: expected 'char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
-../Core/Src/alarm.c:64:29: warning: passing argument 3 of 'CLCD_Puts' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
-   64 |         CLCD_Puts(0, 0, clcd.str1);
-      |                         ~~~~^~~~~
-In file included from ../Core/Src/alarm.c:10:
-../Core/Inc/clcd.h:65:65: note: expected 'unsigned char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
+arm-none-eabi-gcc "../Core/Src/stopwatch.c" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F407xx -c -I../Core/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc -I../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/stopwatch.d" -MT"Core/Src/stopwatch.o" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "Core/Src/stopwatch.o"
+../Core/Src/stopwatch.c: In function 'updateStopwatchDisplay':
+../Core/Src/stopwatch.c:66:17: warning: passing argument 1 of 'sprintf' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
+   66 |     sprintf(clcd.str1, "STW %02d:%02d:%02d.%03d",
+      |             ~~~~^~~~~
+In file included from ../Core/Inc/main.h:35,
+                 from ../Core/Inc/stopwatch.h:12,
+                 from ../Core/Src/stopwatch.c:7:
+C:\ST\STM32CubeIDE_1.16.0\STM32CubeIDE\plugins\com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.12.3.rel1.win32_1.0.200.202406191623\tools\bin/../lib/gcc/arm-none-eabi/12.3.1/../../../../arm-none-eabi/include/stdio.h:250:18: note: expected 'char * restrict' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
+  250 | int     sprintf (char *__restrict, const char *__restrict, ...)
+      |                  ^
+../Core/Src/stopwatch.c:72:25: warning: passing argument 3 of 'CLCD_Puts' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
+   72 |     CLCD_Puts(0, 0, clcd.str1);
+      |                     ~~~~^~~~~
+In file included from ../Core/Src/stopwatch.c:8:
+../Core/Inc/CLCD.h:65:65: note: expected 'unsigned char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
    65 | void CLCD_Puts(unsigned char x, unsigned char y, unsigned char *str);
       |                                                  ~~~~~~~~~~~~~~~^~~
-../Core/Src/alarm.c:65:29: warning: passing argument 3 of 'CLCD_Puts' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
-   65 |         CLCD_Puts(0, 1, clcd.str2);
-      |                         ~~~~^~~~~
-../Core/Inc/clcd.h:65:65: note: expected 'unsigned char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
-   65 | void CLCD_Puts(unsigned char x, unsigned char y, unsigned char *str);
-      |                                                  ~~~~~~~~~~~~~~~^~~
-../Core/Src/alarm.c: In function 'alert':
-../Core/Src/alarm.c:74:33: warning: incompatible implicit declaration of built-in function 'sprintf' [-Wbuiltin-declaration-mismatch]
-   74 |                                 sprintf(clcd.str1,"                ");
-      |                                 ^~~~~~~
-../Core/Src/alarm.c:74:33: note: include '<stdio.h>' or provide a declaration of 'sprintf'
-../Core/Src/alarm.c:74:45: warning: passing argument 1 of 'sprintf' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
-   74 |                                 sprintf(clcd.str1,"                ");
-      |                                         ~~~~^~~~~
-../Core/Src/alarm.c:74:45: note: expected 'char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
-../Core/Src/alarm.c:78:33: warning: incompatible implicit declaration of built-in function 'sprintf' [-Wbuiltin-declaration-mismatch]
-   78 |                                 sprintf(clcd.str1,"ALARM TRIGGERED!");
-      |                                 ^~~~~~~
-../Core/Src/alarm.c:78:33: note: include '<stdio.h>' or provide a declaration of 'sprintf'
-../Core/Src/alarm.c:78:45: warning: passing argument 1 of 'sprintf' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
-   78 |                                 sprintf(clcd.str1,"ALARM TRIGGERED!");
-      |                                         ~~~~^~~~~
-../Core/Src/alarm.c:78:45: note: expected 'char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
-../Core/Src/alarm.c:81:25: warning: incompatible implicit declaration of built-in function 'sprintf' [-Wbuiltin-declaration-mismatch]
-   81 |                         sprintf(clcd.str2,"                ");
-      |                         ^~~~~~~
-../Core/Src/alarm.c:81:25: note: include '<stdio.h>' or provide a declaration of 'sprintf'
-../Core/Src/alarm.c:81:37: warning: passing argument 1 of 'sprintf' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
-   81 |                         sprintf(clcd.str2,"                ");
-      |                                 ~~~~^~~~~
-../Core/Src/alarm.c:81:37: note: expected 'char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
-../Core/Src/alarm.c:82:44: warning: passing argument 3 of 'CLCD_Puts' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
-   82 |                         CLCD_Puts(0, 0,clcd.str1);
-      |                                        ~~~~^~~~~
-../Core/Inc/clcd.h:65:65: note: expected 'unsigned char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
-   65 | void CLCD_Puts(unsigned char x, unsigned char y, unsigned char *str);
-      |                                                  ~~~~~~~~~~~~~~~^~~
-../Core/Src/alarm.c:83:44: warning: passing argument 3 of 'CLCD_Puts' discards 'volatile' qualifier from pointer target type [-Wdiscarded-qualifiers]
-   83 |                         CLCD_Puts(0, 1,clcd.str2);
-      |                                        ~~~~^~~~~
-../Core/Inc/clcd.h:65:65: note: expected 'unsigned char *' but argument is of type 'volatile uint8_t *' {aka 'volatile unsigned char *'}
-   65 | void CLCD_Puts(unsigned char x, unsigned char y, unsigned char *str);
-      |                                                  ~~~~~~~~~~~~~~~^~~
-../Core/Src/alarm.c: In function 'displayAlarmSettings':
-../Core/Src/alarm.c:59:44: warning: '%02d' directive writing between 2 and 3 bytes into a region of size between 1 and 2 [-Wformat-overflow=]
-   59 |         sprintf(clcd.str2,"        %s %02d:%02d",
+../Core/Src/stopwatch.c:66:44: warning: '%03d' directive writing between 3 and 5 bytes into a region of size between 0 and 3 [-Wformat-overflow=]
+   66 |     sprintf(clcd.str1, "STW %02d:%02d:%02d.%03d",
       |                                            ^~~~
-../Core/Src/alarm.c:59:27: note: directive argument in the range [0, 255]
-   59 |         sprintf(clcd.str2,"        %s %02d:%02d",
-      |                           ^~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/alarm.c:59:9: note: 'sprintf' output 17 or more bytes (assuming 19) into a destination of size 16
-   59 |         sprintf(clcd.str2,"        %s %02d:%02d",
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   60 |                         period,
-      |                         ~~~~~~~
-   61 |                         alarm.alarmTime[alarm.alarmIndex].hour,
-      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   62 |                         alarm.alarmTime[alarm.alarmIndex].minute);
-      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/alarm.c: In function 'alert':
-../Core/Src/alarm.c:78:68: warning: 'sprintf' writing a terminating nul past the end of the destination [-Wformat-overflow=]
-   78 |                                 sprintf(clcd.str1,"ALARM TRIGGERED!");
-      |                                                                    ^
-../Core/Src/alarm.c:78:33: note: 'sprintf' output 17 bytes into a destination of size 16
-   78 |                                 sprintf(clcd.str1,"ALARM TRIGGERED!");
-      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/alarm.c:74:68: warning: 'sprintf' writing a terminating nul past the end of the destination [-Wformat-overflow=]
-   74 |                                 sprintf(clcd.str1,"                ");
-      |                                                                    ^
-../Core/Src/alarm.c:74:33: note: 'sprintf' output 17 bytes into a destination of size 16
-   74 |                                 sprintf(clcd.str1,"                ");
-      |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-../Core/Src/alarm.c:81:60: warning: 'sprintf' writing a terminating nul past the end of the destination [-Wformat-overflow=]
-   81 |                         sprintf(clcd.str2,"                ");
-      |                                                            ^
-../Core/Src/alarm.c:81:25: note: 'sprintf' output 17 bytes into a destination of size 16
-   81 |                         sprintf(clcd.str2,"                ");
-      |                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/stopwatch.c:66:24: note: directive argument in the range [0, 65535]
+   66 |     sprintf(clcd.str1, "STW %02d:%02d:%02d.%03d",
+      |                        ^~~~~~~~~~~~~~~~~~~~~~~~~
+../Core/Src/stopwatch.c:66:5: note: 'sprintf' output between 17 and 22 bytes into a destination of size 16
+   66 |     sprintf(clcd.str1, "STW %02d:%02d:%02d.%03d",
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   67 |                 stopwatch.Time.hours,
+      |                 ~~~~~~~~~~~~~~~~~~~~~
+   68 |                         stopwatch.Time.minutes,
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~
+   69 |                         stopwatch.Time.second,
+      |                         ~~~~~~~~~~~~~~~~~~~~~~
+   70 |                         stopwatch.Time.millisecond);
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 arm-none-eabi-gcc -o "digital_clock.elf" @"objects.list"   -mcpu=cortex-m4 -T"C:\Project\digital_clock\digital_clock\STM32F407VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="digital_clock.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 Finished building target: digital_clock.elf
  
 arm-none-eabi-size  digital_clock.elf 
 arm-none-eabi-objdump -h -S digital_clock.elf  > "digital_clock.list"
    text	   data	    bss	    dec	    hex	filename
-  28600	    124	   2260	  30984	   7908	digital_clock.elf
+  31712	    124	   2396	  34232	   85b8	digital_clock.elf
 Finished building: default.size.stdout
  
 Finished building: digital_clock.list
  
 
-18:17:05 Build Finished. 0 errors, 18 warnings. (took 1s.87ms)
+13:42:40 Build Finished. 0 errors, 3 warnings. (took 1s.376ms)
 

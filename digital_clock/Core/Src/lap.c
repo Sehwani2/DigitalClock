@@ -36,8 +36,6 @@ void LapMeasure()
 
 	CLCD_Puts(0, 1, clcd.str2);
 	lap.CurrnetDisplay =0;
-	lap.state = Ready;
-
 }
 
 void LapDisplay()
@@ -60,7 +58,6 @@ void LapDisplay()
 		lap.CurrnetDisplay++;
 	}
 	CLCD_Puts(0, 1, clcd.str2);
-	lap.state = Ready;
 }
 
 void LapClear()
@@ -69,23 +66,4 @@ void LapClear()
 	CLCD_Puts(0, 1, clcd.str2);
 	lap.count = 0;
 	lap.CurrnetDisplay = 0;
-	lap.state  = Ready;
-}
-
-void handleLapState()
-{
-    switch (lap.state)
-    {
-        case Measure:
-            LapMeasure();
-            break;
-
-        case Display:
-            LapDisplay();
-            break;
-
-        case Clear:
-            LapClear();
-            break;
-    }
 }

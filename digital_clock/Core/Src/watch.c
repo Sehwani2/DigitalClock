@@ -9,6 +9,7 @@
 #include "watch.h"
 #include "CLCD.h"
 #include "7SEG.h"
+#include "mode.h"
 #include <stdio.h>
 
 Watch watch;
@@ -17,15 +18,14 @@ WatchConfig watchConfig;
 void InitializeWatch(void)
 {
     watch = (Watch){
-        .Time = {2024, 9, 28, 12, 0, 55, 0},
+        .Time = {2024, 9, 28, 12, 0, 50, 0},
         .isLeap = false,
         .WatchMode = MODE_12_HOUR
     };
 
     watchConfig = (WatchConfig){
         .WatchTime = SET_SECOND,
-        .SubMode = WATCH_NORMAL,
-        .NextItem = false
+        .SubMode = WATCH_NORMAL
     };
 }
 
@@ -260,29 +260,7 @@ void ClockSettingMode(void)
 	    CLCD_Puts(0, 1, clcd.str2);
 }
 
-void UpdateWatchString(char* timeString, int timeValue, int milliseconds)
-{
-//    if (watchConfig.flags.increaseFlagOnce  ||
-//        watchConfig.flags.increaseFlag150ms ||
-//        watchConfig.flags.increaseFlag20ms  ||
-//        watchConfig.flags.decreaseFlagOnce  ||
-//        watchConfig.flags.decreaseFlag150ms ||
-//        watchConfig.flags.decreaseFlag20ms)
-//    {
-//        sprintf(timeString, "%02d", timeValue);
-//    }
-//    else
-//    {
-        if (milliseconds >= 500)
-        {
-            sprintf(timeString, "  ");
-        }
-        else
-        {
-            sprintf(timeString, "%02d", timeValue);
-        }
-    //}
-}
+
 
 
 void IncreaseTimeOnce(void)
@@ -367,31 +345,7 @@ void IncreaseTimeOnce(void)
 			watch.Time.years++;
 		}
 }
-void IncreaseTime(void)
-{
-	if (Btn3.state == Pressing && watchConfig.SubMode == WATCH_CLOCK_SETTING)
-	{
-		switch (Btn3.holdTime)
-		{
-		case BtnHold_Mid:
-			Btn3.SettingModeCount++;
-			if (Btn3.SettingModeCount > 150)
-			{
-				Btn3.SettingModeCount = 0;
-				watchConfig.flags.increaseFlag150ms = 1;
-			}
-			break;
-		case BtnHold_Long:
-			Btn3.SettingModeCount++;
-			if (Btn3.SettingModeCount > 20)
-			{
-				Btn3.SettingModeCount = 0;
-				watchConfig.flags.increaseFlag20ms = 1;
-			}
-			break;
-		}
-	}
-}
+
 void DecreaseTimeOnce(void)
 {
 	switch (watchConfig.WatchTime)
@@ -479,48 +433,4 @@ void DecreaseTimeOnce(void)
 			watch.Time.years = 3000;
 		}
 }
-void DecreaseTime(void)
-{
-	if (Btn4.state == Pressing && watchConfig.SubMode == WATCH_CLOCK_SETTING)
-	{
-		switch (Btn4.holdTime)
-		{
-		case BtnHold_Mid:
-			Btn4.SettingModeCount++;
-			if (Btn4.SettingModeCount > 150) {
-				Btn4.SettingModeCount = 0;
-				watchConfig.flags.decreaseFlag150ms = 1;
-			}
-			break;
-		case BtnHold_Long:
-			Btn4.SettingModeCount++;
-			if (Btn4.SettingModeCount > 20)
-			{
-				Btn4.SettingModeCount = 0;
-				watchConfig.flags.decreaseFlag20ms = 1;
-			}
-			break;
-		}
-	}
-}
-bool AreAllButtonsIdle() {
-    return (Btn1.state == Idle && Btn2.state == Idle && Btn3.state == Idle && Btn4.state == Idle && watchConfig.SubMode == WATCH_CLOCK_SETTING);
-}
 
-void AutoSwitchToWatchMode()
-{
-	if(AreAllButtonsIdle())
-	{
-		watchConfig.IdleTimer ++;
-	}
-	else
-	{
-		watchConfig.IdleTimer  = 0;
-	}
-
-	if(watchConfig.IdleTimer > 30*1000)
-	{
-		watchConfig.SubMode = WATCH_NORMAL;
-		watchConfig.IdleTimer  = 0;
-	}
-}

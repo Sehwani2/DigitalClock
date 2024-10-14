@@ -1,0 +1,44 @@
+/*
+ * extra_config.c
+ *
+ *  Created on: Sep 29, 2024
+ *      Author: hyn02
+ */
+
+
+#include "mode.h"
+#include "btn.h"
+
+
+ModeConfig watchModeConfig = { &(watchConfig.SubMode), NULL };
+ModeConfig alarmModeConfig = { NULL, &(alarmSetting.alarmSubMode) };
+
+bool AreAllButtonsIdle(void)
+{
+    return (Btn1.state == Idle && Btn2.state == Idle && Btn3.state == Idle && Btn4.state == Idle && watchConfig.SubMode == WATCH_CLOCK_SETTING);
+}
+
+void AutoSwitchToWatchMode(ModeConfig *config)
+{
+	if(AreAllButtonsIdle())
+	{
+		IdleTimer ++;
+	}
+	else
+	{
+		IdleTimer  = 0;
+	}
+
+	if(IdleTimer > 30*1000)
+	{
+		if (config->watchSubMode != NULL)
+		{
+		  *(config->watchSubMode) = WATCH_NORMAL; //  시계 모드로 전환
+		}
+		if (config->alarmSubMode != NULL)
+		{
+		  *(config->alarmSubMode) = ALARM_NORMAL; //  알람 모드로 전환
+		}
+		IdleTimer  = 0;
+	}
+}

@@ -36,22 +36,11 @@ typedef struct _WatchStrings {
     char year[5];
 } WatchStrings;
 
-typedef struct _WatchFlags {
-    uint8_t increaseFlagOnce;
-    uint8_t decreaseFlagOnce;
-    uint8_t increaseFlag150ms;
-    uint8_t decreaseFlag150ms;
-    uint8_t increaseFlag20ms;
-    uint8_t decreaseFlag20ms;
-}WatchFlags;
 
 typedef struct _WatchConfig{
 	WatchTimeField WatchTime;
 	WatchStrings watchStrings;
 	WatchSubMode SubMode;
-	bool NextItem;
-	WatchFlags flags;
-    uint16_t IdleTimer;
 }WatchConfig;
 
 
@@ -91,9 +80,7 @@ void updateWatchDisplay(void);
 void ClockSettingMode(void);
 void IncreaseTimeOnce(void);
 void DecreaseTimeOnce(void);
-void UpdateWatchString(char* timeString, int timeValue, int milliseconds);
-bool AreAllButtonsIdle();
-void AutoSwitchToWatchMode();
-void IncreaseTime(void);
-void DecreaseTime(void);
+
+
+
 #endif /* INC_WATCH_H_ */

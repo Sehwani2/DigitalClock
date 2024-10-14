@@ -11,6 +11,14 @@
 #include "main.h"
 #include "buzzer.h"
 
+typedef struct _WatchFlags {
+    uint8_t increaseFlagOnce;
+    uint8_t decreaseFlagOnce;
+    uint8_t increaseFlag150ms;
+    uint8_t decreaseFlag150ms;
+    uint8_t increaseFlag20ms;
+    uint8_t decreaseFlag20ms;
+}TimeAdjustmentFlags;
 ///////////////////////////// BTN
 typedef enum _BtnHold{
 	BtnHold_Idle,
@@ -53,6 +61,7 @@ extern Button Btn1;
 extern Button Btn2;
 extern Button Btn3;
 extern Button Btn4;
+extern TimeAdjustmentFlags TimeFlag;
 
 void InitializeButtons();
 void HandleButtonPress(Button* btn, GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin_Num);
@@ -64,5 +73,11 @@ void WatchHandleButton1(void);
 void WatchHandleButton2(void);
 void WatchHandleButton3(void);
 void WatchHandleButton4(void);
+void AlarmHandleButton1(void);
+void AlarmHandleButton2(void);
+void AlarmHandleButton3(void);
+void AlarmHandleButton4(void);
+void IncreaseTime(void);
+void DecreaseTime(void);
 
 #endif /* INC_BTN_H_ */

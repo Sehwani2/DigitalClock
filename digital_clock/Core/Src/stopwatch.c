@@ -7,8 +7,9 @@
 #include "stopwatch.h"
 #include "CLCD.h"
 #include "7SEG.h"
+#include "mode.h"
 
-volatile StopWatch stopwatch = {STOPPED,{0,0,0,0}};
+volatile StopWatch stopwatch = {STOPPED, {0, 0, 0, 0}};
 
 
 
@@ -37,19 +38,22 @@ void updateStopwatchTime(void)
 
 void updateStopwatchState(void)
 {
-    if(stopwatch.State == RUNNING)
-    {
-    	stopwatch.Time.millisecond++;
-        updateStopwatchTime();
-    }
-
-    if(stopwatch.State == STOPPED)
-    {
-    	stopwatch.Time.hours = 0;
-    	stopwatch.Time.minutes = 0;
-    	stopwatch.Time.second = 0;
-    	stopwatch.Time.millisecond = 0;
-    }
+		if(stopwatch.State == RUNNING)
+		{
+			stopwatch.Time.millisecond++;
+			updateStopwatchTime();
+		}
+		else if (stopwatch.State == PAUSED)
+{
+		    // Do nothing, maintain the current time
+		}
+		else if(stopwatch.State == STOPPED)
+		{
+			stopwatch.Time.hours = 0;
+			stopwatch.Time.minutes = 0;
+			stopwatch.Time.second = 0;
+			stopwatch.Time.millisecond = 0;
+		}
 }
 
 void updateStopwatchDisplay(void)

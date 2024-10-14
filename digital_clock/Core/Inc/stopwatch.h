@@ -12,11 +12,12 @@
 #include "main.h"
 
 // STOPWATCH
-typedef enum _StopWatchState{
-	RUNNING,
-	PAUSED,
-	STOPPED
-}StopWatchState;
+typedef enum _StopWatchState {
+    STOPPED = 0,
+    RUNNING = 1,
+    PAUSED = 2
+} StopWatchState;
+
 
 typedef struct _StopWatchTime{
 	uint8_t hours;
@@ -28,6 +29,7 @@ typedef struct _StopWatchTime{
 typedef struct _StopWatch{
 	StopWatchState State;
 	StopWatchTime Time;
+	uint8_t StopwatchFlag;
 }StopWatch;
 
 extern volatile  StopWatch stopwatch;

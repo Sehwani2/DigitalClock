@@ -6,12 +6,15 @@
  */
 #include "btn.h"
 #include "watch.h"
+#include "alarm.h"
+#include "mode.h"
+#include "stopwatch.h"
 
 Button Btn1;
 Button Btn2;
 Button Btn3;
 Button Btn4;
-
+TimeAdjustmentFlags TimeFlag;
 void InitializeButtons(void)
 {
     Btn1.is_pressed = false;
@@ -168,10 +171,10 @@ void WatchHandleButton2(void)
 		CheckBtnHoldingTime(&Btn2, GPIOC, GPIO_PIN_15);
 		BtnThresHoldEvent(&Btn2, GPIOC, GPIO_PIN_15);
 
-		if (watchConfig.NextItem
+		if (NextItem
 				&& watchConfig.SubMode == WATCH_CLOCK_SETTING)
 		{
-			watchConfig.NextItem = 0;
+			NextItem = 0;
 			watchConfig.WatchTime = (watchConfig.WatchTime + 1) % NUM_ITEM;
 		}
 	}
@@ -195,25 +198,25 @@ void WatchHandleButton3(void)
 		CheckBtnHoldingTime(&Btn3, GPIOD, GPIO_PIN_4);
 		BtnThresHoldEvent(&Btn3, GPIOD, GPIO_PIN_4);
 
-		if (watchConfig.flags.increaseFlagOnce)
+		if (TimeFlag.increaseFlagOnce)
 		{
-			watchConfig.flags.increaseFlagOnce = 0;
+			TimeFlag.increaseFlagOnce = 0;
 			IncreaseTimeOnce();
 		}
 
 		switch (Btn3.holdTime)
 		{
 		case BtnHold_Mid:
-			if (watchConfig.flags.increaseFlag150ms)
+			if (TimeFlag.increaseFlag150ms)
 			{
-				watchConfig.flags.increaseFlag150ms = 0;
+				TimeFlag.increaseFlag150ms = 0;
 				IncreaseTimeOnce();
 			}
 			break;
 		case BtnHold_Long:
-			if (watchConfig.flags.increaseFlag20ms)
+			if (TimeFlag.increaseFlag20ms)
 			{
-				watchConfig.flags.increaseFlag20ms = 0;
+				TimeFlag.increaseFlag20ms = 0;
 				IncreaseTimeOnce();
 			}
 			break;
@@ -240,24 +243,24 @@ void WatchHandleButton4(void)
 		CheckBtnHoldingTime(&Btn4, GPIOD, GPIO_PIN_10);
 		BtnThresHoldEvent(&Btn4, GPIOD, GPIO_PIN_10);
 
-		if (watchConfig.flags.decreaseFlagOnce)
+		if (TimeFlag.decreaseFlagOnce)
 		{
-			watchConfig.flags.decreaseFlagOnce = 0;
+			TimeFlag.decreaseFlagOnce = 0;
 			DecreaseTimeOnce();
 		}
 		switch (Btn4.holdTime)
 		{
 		case BtnHold_Mid:
-			if (watchConfig.flags.decreaseFlag150ms)
+			if (TimeFlag.decreaseFlag150ms)
 			{
-				watchConfig.flags.decreaseFlag150ms = 0;
+				TimeFlag.decreaseFlag150ms = 0;
 				DecreaseTimeOnce();
 			}
 			break;
 		case BtnHold_Long:
-			if (watchConfig.flags.decreaseFlag20ms)
+			if (TimeFlag.decreaseFlag20ms)
 			{
-				watchConfig.flags.decreaseFlag20ms = 0;
+				TimeFlag.decreaseFlag20ms = 0;
 				DecreaseTimeOnce();
 			}
 			break;
@@ -265,3 +268,285 @@ void WatchHandleButton4(void)
 	}
 }
 /////////////////////////////////////////////////////////////////////////
+void StopwatchHandleButton1(void)
+{
+	if (Btn1.state == Pressing)
+	{
+
+	}
+	else // released
+	{
+		if (Btn1.ReleasedTime == Short_Released)
+		{
+			CLCD_Clear();
+			mode = (mode + 1) % NUM_MODES;
+			Btn1.ReleasedTime = Idle_Released;
+		}
+	}
+}
+
+void StopwatchHandleButton2(void)
+{
+	if (Btn2.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn2, GPIOC, GPIO_PIN_15);
+		BtnThresHoldEvent(&Btn2, GPIOC, GPIO_PIN_15);
+		if (stopwatch.StopwatchFlag)
+		{
+			stopwatch.StopwatchFlag = 0;
+
+			switch (stopwatch.State)
+			{
+			case STOPPED:
+				stopwatch.State = RUNNING;
+				break;
+			case RUNNING:
+				stopwatch.State = PAUSED;
+				break;
+			case PAUSED:
+				stopwatch.State = RUNNING;
+				break;
+			}
+		}
+	}
+}
+void StopwatchHandleButton3(void)
+{
+	if (Btn3.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn3, GPIOD, GPIO_PIN_4);
+		BtnThresHoldEvent(&Btn3, GPIOD, GPIO_PIN_4);
+
+		if (stopwatch.StopwatchFlag)
+		{
+			stopwatch.StopwatchFlag = 0;
+
+			switch (stopwatch.State)
+			{
+			case STOPPED:
+				break;
+			case RUNNING:
+				LapMeasure();
+				break;
+			case PAUSED:
+				LapClear();
+				stopwatch.State = STOPPED;
+				break;
+			}
+		}
+	}
+}
+void StopwatchHandleButton4(void)
+{
+	if (Btn4.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn4, GPIOD, GPIO_PIN_10);
+		BtnThresHoldEvent(&Btn4, GPIOD, GPIO_PIN_10);
+		if (stopwatch.StopwatchFlag)
+		{
+			stopwatch.StopwatchFlag = 0;
+
+			LapDisplay();
+		}
+	}
+}
+
+
+
+///////////////////////////////////////////////////
+void DecreaseTime(void)
+{
+	if (Btn4.state == Pressing && (watchConfig.SubMode == WATCH_CLOCK_SETTING || alarmSetting.alarmSubMode == ALARM_SETTING))
+	{
+		switch (Btn4.holdTime)
+		{
+		case BtnHold_Mid:
+			Btn4.SettingModeCount++;
+			if (Btn4.SettingModeCount > 150) {
+				Btn4.SettingModeCount = 0;
+				TimeFlag.decreaseFlag150ms = 1;
+			}
+			break;
+		case BtnHold_Long:
+			Btn4.SettingModeCount++;
+			if (Btn4.SettingModeCount > 20)
+			{
+				Btn4.SettingModeCount = 0;
+				TimeFlag.decreaseFlag20ms = 1;
+			}
+			break;
+		}
+	}
+}
+
+void IncreaseTime(void)
+{
+	if (Btn3.state == Pressing && (watchConfig.SubMode == WATCH_CLOCK_SETTING || alarmSetting.alarmSubMode == ALARM_SETTING))
+	{
+		switch (Btn3.holdTime)
+		{
+		case BtnHold_Mid:
+			Btn3.SettingModeCount++;
+			if (Btn3.SettingModeCount > 150)
+			{
+				Btn3.SettingModeCount = 0;
+				TimeFlag.increaseFlag150ms = 1;
+			}
+			break;
+		case BtnHold_Long:
+			Btn3.SettingModeCount++;
+			if (Btn3.SettingModeCount > 20)
+			{
+				Btn3.SettingModeCount = 0;
+				TimeFlag.increaseFlag20ms = 1;
+			}
+			break;
+		}
+	}
+}
+
+void AlarmHandleButton1(void)
+{
+	if (Btn1.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn1, GPIOE, GPIO_PIN_3);
+		BtnThresHoldEvent(&Btn1, GPIOE, GPIO_PIN_3);
+
+		if (Btn1.btnThreshold == Short_Mid_Threshold)
+		{
+			alarmSetting.alarmSubMode = !alarmSetting.alarmSubMode;
+			alarm.alarmIndex = 0;
+			CLCD_Clear();
+			Btn1.btnThreshold = Idle_Threshold;
+		}
+	}
+	else // released
+	{
+		if (Btn1.ReleasedTime == Short_Released)
+		{
+			if (alarmSetting.alarmSubMode == ALARM_NORMAL)
+			{
+				mode = (mode + 1) % NUM_MODES;
+				alarm.alarmIndex = 0;
+				CLCD_Clear();
+				Btn1.ReleasedTime = Idle_Released;
+			}
+			else if (alarmSetting.alarmSubMode == ALARM_SETTING)
+			{
+				alarm.alarmIndex = (alarm.alarmIndex + 1) % MAX_ALARMS;
+				Btn1.ReleasedTime = Idle_Released;
+			}
+		}
+	}
+}
+
+void AlarmHandleButton2(void)
+{
+	if (Btn2.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn2, GPIOC, GPIO_PIN_15);
+		BtnThresHoldEvent(&Btn2, GPIOC, GPIO_PIN_15);
+
+		if (alarmSetting.alarmSubMode == ALARM_SETTING && NextItem)
+		{
+			NextItem = 0;
+			alarmSetting.alarmField = (alarmSetting.alarmField + 1) % 4;
+		}
+	}
+	else // released
+	{
+		if (Btn2.ReleasedTime == Short_Released)
+		{
+			if (alarmSetting.alarmSubMode == ALARM_NORMAL)
+			{
+				alarm.alarmIndex = (alarm.alarmIndex + 1) % MAX_ALARMS;
+				Btn2.ReleasedTime = Idle_Released;
+			}
+		}
+	}
+}
+
+void AlarmHandleButton3(void)
+{
+	if (Btn3.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn3, GPIOD, GPIO_PIN_4);
+		BtnThresHoldEvent(&Btn3, GPIOD, GPIO_PIN_4);
+
+		if (TimeFlag.increaseFlagOnce)
+		{
+			TimeFlag.increaseFlagOnce = 0;
+			IncreaseAlarmTimeOnce();
+		}
+
+		switch (Btn3.holdTime)
+		{
+		case BtnHold_Mid:
+			if (TimeFlag.increaseFlag150ms)
+			{
+				TimeFlag.increaseFlag150ms = 0;
+				IncreaseAlarmTimeOnce();
+			}
+			break;
+		case BtnHold_Long:
+			if (TimeFlag.increaseFlag20ms)
+			{
+				TimeFlag.increaseFlag20ms = 0;
+				IncreaseAlarmTimeOnce();
+			}
+			break;
+		}
+	}
+	else // released
+	{
+		if (Btn3.ReleasedTime == Short_Released
+				&& alarmSetting.alarmSubMode == ALARM_NORMAL)
+		{
+			alarm.alarmTime[alarm.alarmIndex].isEnabled =
+					!alarm.alarmTime[alarm.alarmIndex].isEnabled;
+			Btn3.ReleasedTime = Idle_Released;
+		}
+	}
+}
+
+void AlarmHandleButton4(void)
+{
+	if (Btn4.state == Pressing)
+	{
+		CheckBtnHoldingTime(&Btn4, GPIOD, GPIO_PIN_10);
+		BtnThresHoldEvent(&Btn4, GPIOD, GPIO_PIN_10);
+
+		if (TimeFlag.decreaseFlagOnce)
+		{
+			TimeFlag.decreaseFlagOnce = 0;
+			DecreaseAlarmTimeOnce();
+		}
+		switch (Btn4.holdTime)
+		{
+		case BtnHold_Mid:
+			if (TimeFlag.decreaseFlag150ms)
+			{
+				TimeFlag.decreaseFlag150ms = 0;
+				DecreaseAlarmTimeOnce();
+			}
+			break;
+		case BtnHold_Long:
+			if (TimeFlag.decreaseFlag20ms)
+			{
+				TimeFlag.decreaseFlag20ms = 0;
+				DecreaseAlarmTimeOnce();
+			}
+			break;
+		}
+	}
+	else // released
+	{
+		if (Btn4.ReleasedTime == Short_Released
+				&& alarmSetting.alarmSubMode == ALARM_NORMAL)
+		{
+			alarm.alarmTime[alarm.alarmIndex].nextAlarmEnabled =
+					!alarm.alarmTime[alarm.alarmIndex].nextAlarmEnabled;
+			Btn4.ReleasedTime = Idle_Released;
+		}
+	}
+}

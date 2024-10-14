@@ -12,19 +12,13 @@
 #include "main.h"
 #include "stopwatch.h"
 
+#define MAX_LAP 9
 //lap
-typedef enum _LapState{
-	Measure,
-	Display,
-	Clear,
-	Ready
-}LapState;
 
 typedef struct _Lap{
 	int count;
 	int CurrnetDisplay;
-	StopWatchTime record[9];
-	LapState state;
+	StopWatchTime record[MAX_LAP];
 }Lap;
 
 extern Lap lap;
@@ -33,6 +27,5 @@ extern Lap lap;
 void LapMeasure();
 void LapDisplay();
 void LapClear();
-void handleLapState();
 
 #endif /* INC_LAP_H_ */

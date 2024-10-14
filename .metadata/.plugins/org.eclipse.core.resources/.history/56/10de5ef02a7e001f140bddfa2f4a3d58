@@ -1,0 +1,38 @@
+/*
+ * extra_config.h
+ *
+ *  Created on: Sep 29, 2024
+ *      Author: hyn02
+ */
+
+#ifndef INC_MODE_H_
+#define INC_MODE_H_
+
+#include "main.h"
+#include "alarm.h"
+#include "watch.h"
+
+#define NUM_MODES 3
+
+typedef enum _Mode{
+	WATCH,
+	ALARM,
+	STOPWATCH,
+}Mode;
+
+
+typedef struct _ModeConfig {
+    WatchSubMode *watchSubMode;
+    AlarmSubMode *alarmSubMode;
+} ModeConfig;
+
+bool AreAllButtonsIdle(void) ;
+void AutoSwitchToMode(ModeConfig *config);
+
+extern volatile Mode mode;
+extern volatile Mode previousMode;
+extern uint32_t IdleTimer;
+
+extern ModeConfig watchModeConfig;
+extern ModeConfig alarmModeConfig;
+#endif /* INC_MODE_H_ */

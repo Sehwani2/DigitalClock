@@ -13,9 +13,10 @@
 #define MAX_ALARMS 5
 
 typedef struct _AlarmTime{
-	uint8_t hour;
-	uint8_t minute;
+	int hour;
+	int minute;
 	uint8_t isEnabled;
+	uint8_t nextAlarmEnabled;
 }AlarmTime;
 
 typedef struct _Alarm{
@@ -26,12 +27,39 @@ typedef struct _Alarm{
 	AlarmTime alarmTime[MAX_ALARMS];
 }Alarm;
 
+typedef struct _AlarmStrings {
+    char index[2];
+    char minute[3];
+    char hour[3];
+} AlarmStrings;
+
+typedef enum _AlarmSubMode {
+    ALARM_NORMAL,
+    ALARM_SETTING
+} AlarmSubMode;
+
+typedef enum _AlarmField{
+	MINUTE,
+	HOUR,
+	NEXT_ALARM_ENABLED,
+	IS_ENABLED,
+}AlarmField;
+
+typedef struct _AlarmSetting{
+	AlarmSubMode alarmSubMode;
+	AlarmField	 alarmField;
+	AlarmStrings alarmStrings;
+}AlarmSetting;
 
 
 void displayAlarmSettings(void);
 void alert(void);
+void IncreaseAlarmTimeOnce(void);
+void DecreaseAlarmTimeOnce(void);
+void AlarmLEDOff(void);
+void triggerAlarm(void);
+
 extern Alarm alarm;
-
-
+extern AlarmSetting alarmSetting;
 
 #endif /* INC_ALARM_H_ */
